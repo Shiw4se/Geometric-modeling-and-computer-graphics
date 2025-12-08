@@ -1,0 +1,301 @@
+﻿<Window x:Class="lab1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:lab1"
+        mc:Ignorable="d"
+        Title="Geometric Modeling Lab" Height="900" Width="1200" 
+        MinHeight="860" MinWidth="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E" Foreground="#DDDDDD">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="DarkBg" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="PanelBg" Color="#252526"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#FF8C00"/> <SolidColorBrush x:Key="TextLight" Color="#EEEEEE"/>
+        <SolidColorBrush x:Key="ControlBg" Color="#333337"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#555555"/>
+
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource ControlBg}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="2">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="#1E1E1E"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#CC7000"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="10,20,0,10"/>
+            <Setter Property="TextDecorations" Value="Underline"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.5*"/> <ColumnDefinition Width="1*"/>   </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Margin="20" Background="#2D2D30" CornerRadius="0">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Color="Black" Opacity="0.5" ShadowDepth="5"/>
+            </Border.Effect>
+            <Canvas x:Name="Cnv" Background="#F5F5F5" ClipToBounds="True"/>
+        </Border>
+
+        <Border Grid.Column="1" Background="{StaticResource PanelBg}" BorderBrush="#3E3E42" BorderThickness="1,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="15">
+                    
+                    <TextBlock Text="GEOMETRY PARAMS" Style="{StaticResource HeaderStyle}" Margin="10,0,0,10"/>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0">AB (H)</Label>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="ABBox" TextChanged="ABBox_OnTextChanged"/>
+                        <Label Grid.Row="0" Grid.Column="2">BC (W)</Label>
+                        <TextBox Grid.Row="0" Grid.Column="3" x:Name="BCBox" TextChanged="BCBox_OnTextChanged"/>
+
+                        <Label Grid.Row="1" Grid.Column="0">CD (H)</Label>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="CDBox" TextChanged="CDBox_OnTextChanged"/>
+                        <Label Grid.Row="1" Grid.Column="2">DA (W)</Label>
+                        <TextBox Grid.Row="1" Grid.Column="3" x:Name="DABox" TextChanged="DABox_OnTextChanged"/>
+
+                        <Label Grid.Row="2" Grid.Column="0">EF (In L)</Label>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="EFBox" TextChanged="EFBox_OnTextChanged"/>
+                        <Label Grid.Row="2" Grid.Column="2">GH (In R)</Label>
+                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="GHBox" TextChanged="GHBox_OnTextChanged"/>
+
+                        <Label Grid.Row="3" Grid.Column="0">IJ (Bott)</Label>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="IJBox" TextChanged="IJBox_OnTextChanged"/>
+                        <Label Grid.Row="3" Grid.Column="2">KL (Top)</Label>
+                        <TextBox Grid.Row="3" Grid.Column="3" x:Name="KLBox" TextChanged="KLBox_OnTextChanged"/>
+
+                        <Label Grid.Row="4" Grid.Column="0" FontSize="11">SideBot</Label>
+                        <TextBox Grid.Row="4" Grid.Column="1" x:Name="SBBox" TextChanged="SBBox_OnTextChanged"/>
+                        <Label Grid.Row="4" Grid.Column="2" FontSize="11">SideTop</Label>
+                        <TextBox Grid.Row="4" Grid.Column="3" x:Name="STBox" TextChanged="STBox_OnTextChanged"/>
+
+                        <Label Grid.Row="5" Grid.Column="0">Circle R</Label>
+                        <TextBox Grid.Row="5" Grid.Column="1" x:Name="CircRBox" TextChanged="CircRBox_OnTextChanged"/>
+
+                        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Content="RESET SHAPE" 
+                                x:Name="test_bt" Click="Polygon_bt_Click" Margin="0,15,0,0" Height="30"/>
+                    </Grid>
+
+                    <Separator Background="#3E3E42" Margin="0,20"/>
+
+                    <TextBlock Text="TRANSFORMATIONS" Style="{StaticResource HeaderStyle}" Margin="10,0,0,10"/>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Move dist:"/>
+                        <TextBox Grid.Column="1" x:Name="MoveBox" Margin="0,0,10,0"/>
+                        <Button Grid.Column="2" Content="MOVE" Width="60" x:Name="move_bt" Click="Move_bt_OnClick"/>
+                    </Grid>
+
+                    <Label Content="Rotation (Center X, Y &amp; Angle)" HorizontalAlignment="Left" Margin="5,5,0,5" Foreground="#AAAAAA" FontSize="10"/>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="XRBox" Margin="2"/>
+                        <TextBox Grid.Column="1" x:Name="YRBox" Margin="2"/>
+                        <TextBox Grid.Column="2" x:Name="AngleBox" Margin="2"/>
+                        <Button Grid.Column="3" Content="ROTATE" Width="60" x:Name="rot_bt" Click="Rot_bt_OnClick" Margin="5,0,0,0"/>
+                    </Grid>
+
+                    <Separator Background="#3E3E42" Margin="0,10"/>
+
+                    <Label Content="Affine Matrix" HorizontalAlignment="Left" Margin="5,5,0,5" Foreground="#AAAAAA" FontSize="10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Label Grid.Row="0" Grid.Column="0">Xx</Label> <TextBox Grid.Row="0" Grid.Column="1" x:Name="XxBox" Text="1"/>
+                        <Label Grid.Row="0" Grid.Column="2">Xy</Label> <TextBox Grid.Row="0" Grid.Column="3" x:Name="XyBox" Text="0"/>
+                        
+                        <Label Grid.Row="1" Grid.Column="0">Yx</Label> <TextBox Grid.Row="1" Grid.Column="1" x:Name="YxBox" Text="0"/>
+                        <Label Grid.Row="1" Grid.Column="2">Yy</Label> <TextBox Grid.Row="1" Grid.Column="3" x:Name="YyBox" Text="1"/>
+                        
+                        <Grid Grid.Row="2" Grid.ColumnSpan="4" Margin="0,5">
+                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0">Ox</Label> <TextBox Grid.Column="1" x:Name="OxBox" Text="0"/>
+                            <Label Grid.Column="2">Oy</Label> <TextBox Grid.Column="3" x:Name="OyBox" Text="0"/>
+                            <Button Grid.Column="4" Content="APPLY" Width="60" x:Name="aph_bt" Click="Aph_bt_OnClick" Margin="10,0,0,0"/>
+                        </Grid>
+                    </Grid>
+
+                    <Separator Background="#3E3E42" Margin="0,10"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0" x:Name="Check1" Content="Enable Projective" Foreground="White" VerticalAlignment="Center" Margin="5"/>
+                        <Button Grid.Column="1" x:Name="proect_bt" Content="PROJECTIVE" Click="Proect_bt_OnClick" IsEnabled="{Binding IsChecked, ElementName=Check1}"/>
+                    </Grid>
+                    
+                    <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBox Grid.Row="0" Grid.Column="0" x:Name="XxPBox" Text="200" Margin="2"/><Label Grid.Row="0" Grid.Column="0" Content="Xx" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="XyPBox" Text="3" Margin="2"/><Label Grid.Row="0" Grid.Column="1" Content="Xy" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                        <TextBox Grid.Row="0" Grid.Column="2" x:Name="WxBox" Text="12" Margin="2"/><Label Grid.Row="0" Grid.Column="2" Content="Wx" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+
+                        <TextBox Grid.Row="1" Grid.Column="0" x:Name="YxPBox" Text="0" Margin="2"/><Label Grid.Row="1" Grid.Column="0" Content="Yx" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="YyPBox" Text="500" Margin="2"/><Label Grid.Row="1" Grid.Column="1" Content="Yy" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" x:Name="WyBox" Text="2" Margin="2"/><Label Grid.Row="1" Grid.Column="2" Content="Wy" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+
+                        <TextBox Grid.Row="2" Grid.Column="0" x:Name="OxPBox" Text="0" Margin="2"/><Label Grid.Row="2" Grid.Column="0" Content="Ox" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="OyPBox" Text="0" Margin="2"/><Label Grid.Row="2" Grid.Column="1" Content="Oy" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" x:Name="WoBox" Text="500" Margin="2"/><Label Grid.Row="2" Grid.Column="2" Content="Wo" FontSize="9" HorizontalAlignment="Left" IsHitTestVisible="False" Foreground="#666"/>
+                    </Grid>
+
+                    <Separator Background="#3E3E42" Margin="0,10"/>
+
+                    <Label Content="Tools" HorizontalAlignment="Left" Margin="5,5,0,5" Foreground="#AAAAAA" FontSize="10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="Sym:"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="SymXBox" Text="100" Margin="2"/>
+                        <TextBox Grid.Row="0" Grid.Column="2" x:Name="SymYBox" Text="25" Margin="2"/>
+                        <Button Grid.Row="0" Grid.Column="3" x:Name="symm_bt" Content="MIRROR" Click="Symm_bt_OnClick" Width="70" Margin="5,2"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="Scale:"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ScaleXBox" Text="1" Margin="2"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" x:Name="ScaleYBox" Text="1" Margin="2"/>
+                        <Button Grid.Row="1" Grid.Column="3" x:Name="scale_bt" Content="SCALE" Click="Scale_bt_OnClick" Width="70" Margin="5,2"/>
+                    </Grid>
+                    
+                    <Border Height="50"/> </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>
