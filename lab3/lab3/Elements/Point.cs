@@ -2,12 +2,11 @@
 
 public class Point
 {
+    // Приватні поля для зберігання координат
     private double _x;
     private double _y;
-    public string PointName;
-    public bool isControl;
-    public bool isNode;
-
+    
+    // Властивості для доступу (з великої літери)
     public double X
     {
         get => _x;
@@ -20,54 +19,34 @@ public class Point
         set { _y = value; }
     }
 
+    // Інші властивості
+    public string PointName { get; set; }
+    public bool isControl { get; set; } // true = Керуюча (зелена), false = Вузлова (червона)
+    public bool isNode { get; set; }    // (Можна використовувати для позначення стиків)
+    
+    // Нове поле для Лабораторної №4 (Гладкість)
+    public bool isSmooth { get; set; } = true; // true = гладкий стик, false = злам
+
+    // Конструктори
     public Point()
     {
         X = 0;
         Y = 0;
         PointName = "Undefined";
-        isControl = false;
-        isNode = false;
     }
 
-    public Point(double x, double y)
-    {
-        X = x;
-        Y = y;
-        PointName = "Undefined";
-        isControl = false;
-        isNode = false;
-    }
-
-    public Point(double x, double y, string name, bool control)
+    public Point(double x, double y, string name = "", bool isControl = false)
     {
         X = x;
         Y = y;
         PointName = name;
-        isControl = control;
-        isNode = false;
+        this.isControl = isControl;
+        this.isNode = !isControl; // Якщо не керуюча, то вузлова
     }
 
-    public Point(double x, double y, string name)
-    {
-        X = x;
-        Y = y;
-        PointName = name;
-        isControl = false;
-        isNode = false;
-    }
-
-    public double XToSystem() => (X - Coordinate.O.X) / Model.PixelsInSm;
-
-    public double YToSystem() => (Coordinate.O.Y - Y) / Model.PixelsInSm;
-
-    public void TransferToCanvas()
-    {
-        X = _x * Model.PixelsInSm + Coordinate.O.X;
-        Y = Coordinate.O.Y - _y * Model.PixelsInSm;
-    }
-
+    // Метод клонування (корисний для анімації та бекапів)
     public Point Clone()
     {
-        return new Point(X, Y);
+        return new Point(X, Y, PointName, isControl) { isNode = this.isNode, isSmooth = this.isSmooth };
     }
 }
