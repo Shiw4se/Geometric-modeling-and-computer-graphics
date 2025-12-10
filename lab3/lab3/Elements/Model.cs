@@ -1,162 +1,166 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace lab3;
-
-public class Model
+namespace lab3
 {
-    public List<Point> Points;
-    public List<Point> CurvePoints;
-    
-    public static double PixelsInSm { get; set; }
-    public static double Ox, Oy;
-
-    // Параметр ваги для раціональної кривої (важливо для другого методу)
-    public static double HyperbolaWeight = 2.0; 
-
-    public Model(double pix)
+    public class Model
     {
-        Points = new List<Point>();
-        PixelsInSm = pix;
-        
-        CreatePoints();      // Генеруємо каркас пальми
-        CreateCurvePoints(); // Рахуємо гладку лінію (другий метод)
-    }
+        public List<Point> Points = new();
+        public List<Point> CurvePoints = new();
 
-    // Метод побудови точок (Пальма)
-    private void CreatePoints()
-    {
-        Points.Clear();
+        public static double HyperbolaWeight = 2.0;
 
-        // Центр "корони" пальми (верхівка стовбура)
-        double cx = 715; 
-        double cy = 380;
-
-        // ==========================================
-        // 1. ОСТРІВ (Трохи підправив під референс)
-        // ==========================================
-        // Лівий край (рваний)
-        AddSegment(150, 780,  200, 760,  220, 780); 
-        AddSegment(220, 780,  240, 750,  280, 770); 
-        // Основний пагорб
-        AddSegment(280, 770,  350, 680,  450, 700);
-        AddSegment(450, 700,  500, 720,  550, 750); 
-        // Правий хвіст
-        AddSegment(780, 750,  900, 730,  1000, 750); 
-        AddSegment(1000, 750, 1020, 760, 1030, 800); 
-        // Низ острова
-        AddSegment(1030, 800, 800, 810,  600, 805);
-        AddSegment(600, 805,  400, 810,  150, 780); 
-
-        // ==========================================
-        // 2. СТОВБУР (Вигнутий як на референсі)
-        // ==========================================
-        // Ліва сторона (дуга вправо)
-        AddSegment(550, 750,  650, 600,  680, 500); 
-        AddSegment(680, 500,  700, 420,  cx, cy);
-
-        // Права сторона (паралельна дуга)
-        // Повертаємось від центру вниз
-        AddSegment(cx + 15, cy + 10, 730, 480, 700, 600);
-        AddSegment(700, 600,  680, 700, 780, 750); 
-
-
-        // ==========================================
-        // 3. ЛИСТЯ (ТЕПЕР ОБ'ЄМНЕ З ЗУБЧИКАМИ)
-        // ==========================================
-        
-        // --- ЛИСТОК 1 (Лівий Верхній - стирчить вліво) ---
-        // Верхня грань (гладка)
-        AddSegment(cx, cy,    650, 300,  580, 280); 
-        // Кінчик листка
-        AddSegment(580, 280,  560, 275,  540, 300); 
-        // Нижня грань (ЗУБЧИКИ назад до центру)
-        AddSegment(540, 300,  570, 310,  590, 330); // Зуб 1
-        AddSegment(590, 330,  610, 310,  630, 340); // Зуб 2
-        AddSegment(630, 340,  660, 350,  cx, cy);   // До стовбура
-
-        // --- ЛИСТОК 2 (Лівий Нижній - звисає вниз) ---
-        // Верхня грань
-        AddSegment(cx, cy,    640, 380,  580, 400);
-        AddSegment(580, 400,  550, 420,  520, 460); // Кінчик вниз
-        // Повернення (внутрішня рвана частина)
-        AddSegment(520, 460,  540, 430,  560, 440); // Зубчик
-        AddSegment(560, 440,  580, 410,  610, 430); // Зубчик
-        AddSegment(610, 430,  650, 410,  cx, cy);
-
-        // --- ЛИСТОК 3 (Правий Великий - "парасолька") ---
-        // Це найбільший листок, що накриває пальму зверху
-        // Верхня дуга
-        AddSegment(cx, cy,    750, 200,  850, 180);
-        AddSegment(850, 180,  920, 200,  980, 280); // Кінчик справа внизу
-        // Нижня грань (повертаємось "хвилями")
-        AddSegment(980, 280,  940, 250,  900, 290); // Великий виріз
-        AddSegment(900, 290,  880, 240,  840, 270); // Менший виріз
-        AddSegment(840, 270,  800, 300,  cx, cy);   // Замикаємо
-
-        // --- ЛИСТОК 4 (Правий Нижній - короткий) ---
-        // Верхня грань
-        AddSegment(cx, cy,    780, 350,  820, 380);
-        // Кінчик звисає
-        AddSegment(820, 380,  840, 400,  850, 450);
-        // Нижня грань (повернення)
-        AddSegment(850, 450,  820, 420,  800, 440); // Зубчик
-        AddSegment(800, 440,  780, 400,  cx, cy);
-        
-        // --- ЛИСТОК 5 (Маленький чубчик по центру) ---
-        // Стирчить прямо вгору, закриває стик
-        AddSegment(cx, cy,    700, 300,  720, 250); // Вгору лівіше
-        AddSegment(720, 250,  730, 300,  cx, cy);   // Вниз
-    }
-
-    // Допоміжний метод для додавання трійки точок
-    // Адаптовано під конструктор Point(x, y, name, isControl)
-    private void AddSegment(double x1, double y1, double x2, double y2, double x3, double y3)
-    {
-        // P(i) - звичайна точка
-        Points.Add(new Point(x1, y1, "Start"));          
-        // P(i+1) - контрольна точка (тягне криву на себе)
-        Points.Add(new Point(x2, y2, "Control", true)); 
-        // P(i+2) - звичайна точка
-        Points.Add(new Point(x3, y3, "End"));          
-    }
-
-    // Метод розрахунку кривої (Другий метод: Раціональна крива Безьє)
-    public void CreateCurvePoints()
-    {
-        CurvePoints = new List<Point>();
-        double w = HyperbolaWeight; 
-
-        // УВАГА: Тут крок циклу i += 3, тому що ми додаємо точки трійками через AddSegment
-        for (int i = 0; i < Points.Count - 2; i += 3)
+        public Model(double pix)
         {
-            double P0x = Points[i].X;     double P0y = Points[i].Y;
-            double P1x = Points[i + 1].X; double P1y = Points[i + 1].Y; // Контрольна
-            double P2x = Points[i + 2].X; double P2y = Points[i + 2].Y;
-
-            // Будуємо сегмент кривої
-            for (double u = 0; u <= 1; u += 0.02) // Крок 0.02 для плавності
-            {
-                // Формула раціональної кривої Безьє 2-го порядку
-                double poly0 = Math.Pow(1 - u, 2);
-                double poly1 = 2 * u * (1 - u) * w; // Тут враховується вага w
-                double poly2 = Math.Pow(u, 2);
-
-                double denominator = poly0 + poly1 + poly2;
-
-                double x = (poly0 * P0x + poly1 * P1x + poly2 * P2x) / denominator;
-                double y = (poly0 * P0y + poly1 * P1y + poly2 * P2y) / denominator;
-
-                CurvePoints.Add(new Point(x, y));
-            }
-            
-            // Додаємо останню точку сегмента, щоб уникнути розривів при малюванні
-            CurvePoints.Add(new Point(P2x, P2y)); 
+            CreatePoints();
+            CreateCurvePoints();
         }
-    }
 
-    public static double DegToRad(double deg)
-    {
-        return deg * Math.PI / 180;
+        // ------------------ Допоміжні конструктори точок ------------------
+
+        private static Point P(double x, double y, bool isControl = false)
+            => new Point(x, y, "", isControl);
+
+        private void AddSegment(Point p0, Point p1, Point p2)
+        {
+            Points.Add(p0);
+            Points.Add(p1);
+            Points.Add(p2);
+        }
+
+        // ========================== Геометрія сцени ==========================
+
+        private void CreatePoints()
+        {
+            Points.Clear();
+
+            double cx = 715;
+            double cy = 380;
+
+            // Спільний центр крони (одна і та сама точка для всіх листків)
+            var center = P(cx, cy);
+
+            // ----------------------------- 1) ОСТРІВ -----------------------------
+
+            var i0 = P(150, 780);  // лівий край
+            var i1 = P(220, 780);
+            var i2 = P(280, 770);
+            var i3 = P(450, 700);
+            var i4 = P(550, 750);  // біля стовбура
+
+            var i5 = P(780, 750);  // правіше стовбура
+            var i6 = P(1000, 750);
+            var i7 = P(1030, 800);
+            var i8 = P(600, 805);
+
+            // кільце зшите: остання вершина замикається назад в i0
+            AddSegment(i0, P(200, 760, true), i1);
+            AddSegment(i1, P(240, 750, true), i2);
+            AddSegment(i2, P(350, 680, true), i3);
+            AddSegment(i3, P(500, 720, true), i4);
+
+            AddSegment(i5, P(900, 730, true), i6);
+            AddSegment(i6, P(1020, 760, true), i7);
+            AddSegment(i7, P(800, 810, true), i8);
+            AddSegment(i8, P(400, 810, true), i0);   // повертаємося у ту ж саму i0
+
+            // ----------------------------- 2) СТОВБУР -----------------------------
+
+            // Використовуємо i4 і i5 як базові точки стовбура на острові
+            var trunkMidL  = P(680, 500);
+            var trunkMidR  = P(700, 600);
+
+            AddSegment(i4,      P(650, 600, true), trunkMidL);
+            AddSegment(trunkMidL, P(700, 420, true), center);
+
+            var topRight = P(cx + 15, cy + 10);
+            AddSegment(topRight, P(730, 480, true), trunkMidR);
+            AddSegment(trunkMidR, P(680, 700, true), i5);
+
+            // ----------------------------- 3) ЛИСТЯ -----------------------------
+
+            // Лист 1 (ліво-верхній)
+            var l1_tip1 = P(580, 280);
+            var l1_tip2 = P(540, 300);
+            var l1_mid1 = P(590, 330);
+            var l1_mid2 = P(630, 340);
+
+            AddSegment(center,  P(650, 300, true), l1_tip1);
+            AddSegment(l1_tip1, P(560, 275, true), l1_tip2);
+            AddSegment(l1_tip2, P(570, 310, true), l1_mid1);
+            AddSegment(l1_mid1, P(610, 310, true), l1_mid2);
+            AddSegment(l1_mid2, P(660, 350, true), center);
+
+            // Лист 2 (ліво-нижній)
+            var l2_a = P(580, 400);
+            var l2_b = P(520, 460);
+            var l2_c = P(560, 440);
+            var l2_d = P(610, 430);
+
+            AddSegment(center, P(640, 380, true), l2_a);
+            AddSegment(l2_a,   P(550, 420, true), l2_b);
+            AddSegment(l2_b,   P(540, 430, true), l2_c);
+            AddSegment(l2_c,   P(580, 410, true), l2_d);
+            AddSegment(l2_d,   P(650, 410, true), center);
+
+            // Лист 3 (великий правий)
+            var l3_a = P(850, 180);
+            var l3_b = P(980, 280);
+            var l3_c = P(900, 290);
+            var l3_d = P(840, 270);
+            var l3_e = P(800, 300);
+
+            AddSegment(center, P(750, 200, true), l3_a);
+            AddSegment(l3_a,   P(920, 200, true), l3_b);
+            AddSegment(l3_b,   P(940, 250, true), l3_c);
+            AddSegment(l3_c,   P(880, 240, true), l3_d);
+            AddSegment(l3_d,   P(800, 300, true), l3_e);
+            AddSegment(l3_e,   P(800, 300, true), center);
+
+            // Лист 4 (правий нижній)
+            var l4_a = P(820, 380);
+            var l4_b = P(850, 450);
+            var l4_c = P(800, 440);
+
+            AddSegment(center, P(780, 350, true), l4_a);
+            AddSegment(l4_a,   P(840, 400, true), l4_b);
+            AddSegment(l4_b,   P(820, 420, true), l4_c);
+            AddSegment(l4_c,   P(780, 400, true), center);
+
+            // Маленький лист по центру
+            var l5_tip = P(720, 250);
+            AddSegment(center, P(700, 300, true), l5_tip);
+            AddSegment(l5_tip, P(730, 300, true), center);
+        }
+
+        // ======================= Побудова кривої =======================
+
+        public void CreateCurvePoints()
+        {
+            CurvePoints.Clear();
+
+            for (int i = 0; i < Points.Count - 2; i += 3)
+            {
+                var P0 = Points[i];
+                var P1 = Points[i + 1];
+                var P2 = Points[i + 2];
+
+                for (double u = 0; u <= 1; u += 0.02)
+                {
+                    double b0 = (1 - u) * (1 - u);
+                    double b1 = 2 * u * (1 - u) * HyperbolaWeight;
+                    double b2 = u * u;
+
+                    double denom = b0 + b1 + b2;
+
+                    double x = (b0 * P0.X + b1 * P1.X + b2 * P2.X) / denom;
+                    double y = (b0 * P0.Y + b1 * P1.Y + b2 * P2.Y) / denom;
+
+                    CurvePoints.Add(new Point(x, y));
+                }
+
+                CurvePoints.Add(new Point(P2.X, P2.Y));
+            }
+        }
     }
 }

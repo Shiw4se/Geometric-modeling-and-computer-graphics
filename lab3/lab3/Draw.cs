@@ -61,13 +61,6 @@ public class Draw
         {
             for (int i = 0; i < _model.Points.Count - 1; i++)
             {
-                // Only draw dashed lines between control points of the same segment
-                // Segments are triplets: 0-1-2, 3-4-5...
-                // So we connect i -> i+1.
-                // We avoid connecting end of one segment (2) to start of next (3) if they are separate logic.
-                
-                // Logic: 0->1, 1->2 (draw). 2->3 (don't draw if it's a jump, but our create points logic often duplicates points).
-                // Let's draw all sequential points for visualization purposes.
                 
                 DrawDashedLine(_model.Points[i], _model.Points[i+1]);
                 
@@ -103,8 +96,20 @@ public class Draw
 
     private Ellipse CreatePoint(Point coord)
     {
-        Brush color = Brushes.Red;
-        if (coord.isControl) color = Brushes.Green;
+        Brush color;
+
+        if (coord.isControl)
+        {
+            // Реперні точки – зелені
+            color = Brushes.Green;
+        }
+        else
+        {
+            // Вузлові:
+            //   звичайна вузлова – червона
+            //   точка зламу – помаранчева (для наочності)
+            color = coord.IsBreak ? Brushes.OrangeRed : Brushes.Red;
+        }
 
         Ellipse point = new Ellipse
         {
@@ -114,9 +119,9 @@ public class Draw
             Stroke = Brushes.Black,
             StrokeThickness = 1,
             ToolTip = $"{coord.PointName}: {coord.X:F0}, {coord.Y:F0}",
-            Tag = coord // Store reference to Point object
+            Tag = coord
         };
-        
+
         Canvas.SetLeft(point, coord.X - 5);
         Canvas.SetTop(point, coord.Y - 5);
 
@@ -126,10 +131,50 @@ public class Draw
             point.MouseLeftButtonUp += Point_MouseLeftButtonUp;
             point.MouseMove += Point_MouseMove;
         }
-        
+
         return point;
     }
 
+    private void EnforceC1ForControl(Point moved)
+    {
+        var pts = _model.Points;
+        int idx = pts.IndexOf(moved);
+        if (idx == -1) return;
+
+        // ВАРІАНТ А:
+        // moved = C_prev в патерні [C_prev, K, K, C_next]
+        if (idx + 3 < pts.Count)
+        {
+            var k1 = pts[idx + 1];
+            var k2 = pts[idx + 2];
+
+            // одна й та сама вузлова точка + не точка зламу
+            if (ReferenceEquals(k1, k2) && !k1.IsBreak)
+            {
+                var opposite = pts[idx + 3]; // C_next
+                opposite.X = 2 * k1.X - moved.X;
+                opposite.Y = 2 * k1.Y - moved.Y;
+            }
+        }
+
+        // ВАРІАНТ Б:
+        // moved = C_next в патерні [C_prev, K, K, C_next]
+        if (idx - 3 >= 0)
+        {
+            var k1 = pts[idx - 1];
+            var k2 = pts[idx - 2];
+
+            if (ReferenceEquals(k1, k2) && !k1.IsBreak)
+            {
+                var opposite = pts[idx - 3]; // C_prev
+                opposite.X = 2 * k1.X - moved.X;
+                opposite.Y = 2 * k1.Y - moved.Y;
+            }
+        }
+    }
+
+    
+    
     // --- Drag & Drop ---
     private bool isDragging = false;
     private Ellipse draggedEllipse = null;
@@ -155,21 +200,28 @@ public class Draw
 
     private void Point_MouseMove(object sender, MouseEventArgs e)
     {
-        if (isDragging && draggedEllipse != null)
-        {
-            var mousePos = e.GetPosition(_canvas);
-            
-            Canvas.SetLeft(draggedEllipse, mousePos.X - 5);
-            Canvas.SetTop(draggedEllipse, mousePos.Y - 5);
+        if (!isDragging || draggedEllipse == null)
+            return;
 
-            var pointData = draggedEllipse.Tag as Point;
-            if (pointData != null)
+        var mousePos = e.GetPosition(_canvas);
+
+        Canvas.SetLeft(draggedEllipse, mousePos.X - 5);
+        Canvas.SetTop(draggedEllipse, mousePos.Y - 5);
+
+        var pointData = draggedEllipse.Tag as Point;
+        if (pointData != null)
+        {
+            pointData.X = mousePos.X;
+            pointData.Y = mousePos.Y;
+
+            // Якщо це реперна точка – підтримуємо C1-гладкість
+            if (pointData.isControl)
             {
-                pointData.X = mousePos.X;
-                pointData.Y = mousePos.Y;
+                EnforceC1ForControl(pointData);
             }
         }
     }
+    
 
     // --- Line Drawing Helpers ---
 

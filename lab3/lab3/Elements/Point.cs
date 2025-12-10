@@ -27,6 +27,7 @@ public class Point
     // Нове поле для Лабораторної №4 (Гладкість)
     public bool isSmooth { get; set; } = true; // true = гладкий стик, false = злам
 
+    public bool IsBreak;
     // Конструктори
     public Point()
     {

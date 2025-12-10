@@ -61,29 +61,24 @@ public partial class MainWindow : Window
 
     private void MouseRightButtonClicked(object sender, MouseButtonEventArgs e)
     {
-        // Зміна типу точки (Вузлова <-> Керуюча) при кліку правою кнопкою
-        // Потрібно знайти, по якому еліпсу клікнули.
-        // Оскільки sender тут Canvas, нам треба hit testing або перевірка координат.
-        // Але простіше підписатися на події самих еліпсів у Draw.
-        
-        // Якщо клік був по еліпсу (e.OriginalSource)
         if (e.OriginalSource is Ellipse pointEllipse)
         {
-            // Знаходимо точку в моделі, яка відповідає цьому еліпсу
-            // У Draw.cs ми записали посилання на точку в Tag
             var pointData = pointEllipse.Tag as Point;
-            
-            if (pointData != null)
+            if (pointData == null)
+                return;
+
+            // Реперні точки (зелені) не чіпаємо – тільки вузлові (червоні)
+            if (!pointData.isControl)
             {
-                // Перемикаємо тип
-                pointData.isControl = !pointData.isControl;
-                
-                // Перераховуємо і перемальовуємо
+                // Тоглимо: вузлова ↔ точка зламу
+                pointData.IsBreak = !pointData.IsBreak;
+
                 _model.CreateCurvePoints();
                 _drawer.DrawModel();
             }
         }
     }
+
 
     // --- НАЛАШТУВАННЯ КРИВОЇ ---
 
@@ -153,7 +148,7 @@ public partial class MainWindow : Window
     {
         if (double.TryParse(MXox.Text, out double dx) && double.TryParse(MYox.Text, out double dy))
         {
-            Euclidian.Move(dx, dy, _pixelsInSm, _model);
+            Euclidian.Move(dx, dy, _model);
             // CreateCurvePoints викликається всередині Euclidian.Move
             _drawer.DrawModel();
         }

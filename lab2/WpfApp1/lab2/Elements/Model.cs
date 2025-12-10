@@ -72,18 +72,11 @@ public class Model
 
         for (double phi = 0; phi <= maxPhi; phi += step)
         {
-            // --- ФОРМУЛА ТРОЯНДИ ---
-            // r = a * sin(k * phi)
-            // (можна використовувати cos, це просто поверне квітку)
+          
+            // r = a * sin(k * phi) (cos, це просто поверне квітку)
             
             double r = A * Math.Sin(K * phi) * PixelsInSm; // Множимо на масштаб
-
-            // Перехід в Декартові координати + зсув до центру екрану
-            // x = r * cos(phi) + Ox
-            // y = r * sin(phi) + Oy
-            // У комп'ютерній графіці Y часто інвертований (мінус), 
-            // але для полярних це просто змінить напрямок обходу.
-            // Зробимо класично: Y росте вниз, тому "-" щоб Y ріс вгору візуально
+            
             
             var x = r * Math.Cos(phi) + CoordinateSystem.O.X;
             var y = CoordinateSystem.O.Y - r * Math.Sin(phi); 
